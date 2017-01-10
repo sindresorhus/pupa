@@ -1,0 +1,49 @@
+{
+  "name": "pupa",
+  "version": "0.0.0",
+  "description": "Simple micro templating",
+  "license": "MIT",
+  "repository": "sindresorhus/pupa",
+  "author": {
+    "name": "Sindre Sorhus",
+    "email": "sindresorhus@gmail.com",
+    "url": "sindresorhus.com"
+  },
+  "engines": {
+    "node": ">=4"
+  },
+  "scripts": {
+    "test": "xo && ava"
+  },
+  "files": [
+    "index.js"
+  ],
+  "keywords": [
+    "string",
+    "formatting",
+    "template",
+    "object",
+    "format",
+    "interpolate",
+    "interpolation",
+    "templating",
+    "str",
+    "obj",
+    "tpl",
+    "expand",
+    "simple",
+    "replace",
+    "placeholders",
+    "values",
+    "fmt",
+    "transform",
+    "micro"
+  ],
+  "devDependencies": {
+    "ava": "*",
+    "xo": "*"
+  },
+  "xo": {
+    "esnext": true
+  }
+}
