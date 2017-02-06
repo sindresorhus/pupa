@@ -10,6 +10,12 @@ module.exports = (tpl, data) => {
 
 	const re = /{(.*?)}/g;
 
+	if (Array.isArray(data) && tpl.indexOf('{this}') > 0) {
+		return data.reduce((acc, item) => {
+			return acc + tpl.replace('{this}', item);
+		}, '');
+	}
+
 	return tpl.replace(re, (_, key) => {
 		let ret = data;
 
