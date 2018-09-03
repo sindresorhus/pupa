@@ -9,12 +9,18 @@ module.exports = (tpl, data) => {
 	}
 
 	const re = /{(.*?)}/g;
+	const array_re = /^([a-zA-Z0-9]*)\[(.*)\]$/;
 
 	return tpl.replace(re, (_, key) => {
 		let ret = data;
 
 		for (const prop of key.split('.')) {
-			ret = ret ? ret[prop] : '';
+			if(prop.match(array_re)) {
+		                let matching = array_re.exec(prop);
+                		ret = ret[ matching[1] ] [ matching[2] ];
+            		} else {
+                		ret = ret ? ret[prop] : '';
+            		}
 		}
 
 		return ret || '';
