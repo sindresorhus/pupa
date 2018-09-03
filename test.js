@@ -18,5 +18,6 @@ test(t => {
 	}), '!#');
 
 	t.is(m('{0}{1}', ['!', '#']), '!#');
+	t.is(m('{results[0].field1} and {results[0].field2}', {results:[{field1:'v',field2:'v2'}]}) , 'v and v2');
 });
 
