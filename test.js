@@ -1,14 +1,14 @@
 import test from 'ava';
-import m from './';
+import pupa from '.';
 
-test(t => {
-	t.is(m('{foo}', {foo: '!'}), '!');
-	t.is(m('{foo}', {foo: 10}), '10');
-	t.is(m('{foo}{foo}', {foo: '!'}), '!!');
-	t.is(m('{foo}{bar}{foo}', {foo: '!', bar: '#'}), '!#!');
-	t.is(m('yo {foo} lol {bar} sup', {foo: '🦄', bar: '🌈'}), 'yo 🦄 lol 🌈 sup');
+test('main', t => {
+	t.is(pupa('{foo}', {foo: '!'}), '!');
+	t.is(pupa('{foo}', {foo: 10}), '10');
+	t.is(pupa('{foo}{foo}', {foo: '!'}), '!!');
+	t.is(pupa('{foo}{bar}{foo}', {foo: '!', bar: '#'}), '!#!');
+	t.is(pupa('yo {foo} lol {bar} sup', {foo: '🦄', bar: '🌈'}), 'yo 🦄 lol 🌈 sup');
 
-	t.is(m('{foo}{deeply.nested.value}', {
+	t.is(pupa('{foo}{deeply.nested.value}', {
 		foo: '!',
 		deeply: {
 			nested: {
@@ -17,6 +17,6 @@ test(t => {
 		}
 	}), '!#');
 
-	t.is(m('{0}{1}', ['!', '#']), '!#');
+	t.is(pupa('{0}{1}', ['!', '#']), '!#');
 });
 

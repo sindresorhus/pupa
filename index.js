@@ -1,16 +1,17 @@
 'use strict';
-module.exports = (tpl, data) => {
-	if (typeof tpl !== 'string') {
-		throw new TypeError(`Expected a string in the first argument, got ${typeof tpl}`);
+
+module.exports = (template, data) => {
+	if (typeof template !== 'string') {
+		throw new TypeError(`Expected a string in the first argument, got ${typeof template}`);
 	}
 
 	if (typeof data !== 'object') {
 		throw new TypeError(`Expected an Object/Array in the second argument, got ${typeof data}`);
 	}
 
-	const re = /{(.*?)}/g;
+	const regex = /{(.*?)}/g;
 
-	return tpl.replace(re, (_, key) => {
+	return template.replace(regex, (_, key) => {
 		let ret = data;
 
 		for (const prop of key.split('.')) {

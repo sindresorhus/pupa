@@ -8,7 +8,7 @@ Useful when all you need is to fill in some placeholders.
 ## Install
 
 ```
-$ npm install --save pupa
+$ npm install pupa
 ```
 
 
