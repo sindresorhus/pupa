@@ -9,30 +9,30 @@ module.exports = (template, data) => {
 		throw new TypeError(`Expected an Object/Array in the second argument, got ${typeof data}`);
 	}
 
-	const HTMLregex = /{{(.*?)}}/g
+	const HTMLregex = /{{(.*?)}}/g;
 
 	if (HTMLregex.test(template)) {
 		template = template.replace(HTMLregex, (_, key) => {
 			let ret = data;
-	
 			for (const prop of key.split('.')) {
 				ret = ret ? ret[prop] : '';
 			}
-			
+
 			// Encoding HTML Entities to avoid code injection
-			ret = ret.replace(/[&"<>]/g, (c) => {
+			const HTMLentities = /[&"<>]/g;
+			ret = ret.toString().replace(HTMLentities, c => {
 				return {
-					'&': "&amp;",
-					'"': "&quot;",
-					'<': "&lt;",
-					'>': "&gt;"
+					'&': '&amp;',
+					'"': '&quot;',
+					'<': '&lt;',
+					'>': '&gt;'
 				}[c];
 			});
 
 			return ret || '';
 		});
 	}
-	
+
 	const regex = /{(.*?)}/g;
 
 	return template.replace(regex, (_, key) => {

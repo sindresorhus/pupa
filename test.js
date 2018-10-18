@@ -38,6 +38,6 @@ test('main', t => {
 
 	t.is(pupa('{{0}}{{1}}', ['!', '#']), '!#');
 
-	t.is(pupa('{{0}}{{1}}', ['<br>yo</br>', '<i>lol</i>']), '&lt;b&gt;yo&lt;/b&gt;&lt;b&gt;lol&lt;/b&gt;');
+	t.is(pupa('{{0}}{{1}}', ['<br>yo</br>', '<i>lol</i>']), '&lt;br&gt;yo&lt;/br&gt;&lt;i&gt;lol&lt;/i&gt;');
 });
 
