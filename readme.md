@@ -28,7 +28,7 @@ pupa('The mobile number of {name} is {phone.mobile}', {
 pupa('I like {0} and {1}', ['🦄', '🐮']);
 //=> 'I like 🦄 and 🐮'
 
-//	Double braces encodes the HTML entities to avoid code injection.
+// Double braces encodes the HTML entities to avoid code injection.
 pupa('{{0}}{{1}}', ['<br>yo</br>', '<i>lol</i>']);
 //=> '&lt;b&gt;yo&lt;/b&gt;&lt;b&gt;lol&lt;/b&gt;
 
