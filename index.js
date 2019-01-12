@@ -21,7 +21,7 @@ module.exports = (template, data) => {
 			}
 
 			// Encoding HTML Entities to avoid code injection
-			ret = escapeGoat.escape(ret);
+			ret = escapeGoat.escape(ret.toString());
 
 			return ret || '';
 		});
