@@ -1,5 +1,7 @@
 'use strict';
 
+const escapeGoat = require('escape-goat');
+
 module.exports = (template, data) => {
 	if (typeof template !== 'string') {
 		throw new TypeError(`Expected a string in the first argument, got ${typeof template}`);
@@ -19,15 +21,7 @@ module.exports = (template, data) => {
 			}
 
 			// Encoding HTML Entities to avoid code injection
-			const HTMLentities = /[&"<>]/g;
-			ret = ret.toString().replace(HTMLentities, c => {
-				return {
-					'&': '&amp;',
-					'"': '&quot;',
-					'<': '&lt;',
-					'>': '&gt;'
-				}[c];
-			});
+			ret = escapeGoat.escape(ret);
 
 			return ret || '';
 		});
