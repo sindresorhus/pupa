@@ -30,12 +30,12 @@ module.exports = (template, data) => {
 	const regex = /{(.*?)}/g;
 
 	return template.replace(regex, (_, key) => {
-		let ret = data;
+		let result = data;
 
-		for (const prop of key.split('.')) {
-			ret = ret ? ret[prop] : '';
+		for (const property of key.split('.')) {
+			result = result ? result[property] : '';
 		}
 
-		return ret || '';
+		return result || '';
 	});
 };

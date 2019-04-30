@@ -46,7 +46,7 @@ Text with placeholders for `data` properties.
 
 #### data
 
-Type: `Object` `Array`
+Type: `object | unknown[]`
 
 Data to interpolate into `template`.
 
