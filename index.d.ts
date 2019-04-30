@@ -18,6 +18,10 @@ pupa('The mobile number of {name} is {phone.mobile}', {
 
 pupa('I like {0} and {1}', ['🦄', '🐮']);
 //=> 'I like 🦄 and 🐮'
+
+// Double braces encodes the HTML entities to avoid code injection
+pupa('I like {{0}} and {{1}}', ['<br>🦄</br>', '<i>🐮</i>']);
+//=> 'I like &lt;br&gt;🦄&lt;/br&gt; and &lt;i&gt;🐮&lt;/i&gt;'
 ```
 */
 declare function pupa(

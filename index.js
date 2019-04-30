@@ -1,35 +1,32 @@
 'use strict';
-
-const escapeGoat = require('escape-goat');
+const {htmlEscape} = require('escape-goat');
 
 module.exports = (template, data) => {
 	if (typeof template !== 'string') {
-		throw new TypeError(`Expected a string in the first argument, got ${typeof template}`);
+		throw new TypeError(`Expected a \`string\` in the first argument, got \`${typeof template}\``);
 	}
 
 	if (typeof data !== 'object') {
-		throw new TypeError(`Expected an Object/Array in the second argument, got ${typeof data}`);
+		throw new TypeError(`Expected an \`object\` or \`Array\` in the second argument, got \`${typeof data}\``);
 	}
 
-	const HTMLregex = /{{(.*?)}}/g;
+	const doubleBraceRegex = /{{(.*?)}}/g;
 
-	if (HTMLregex.test(template)) {
-		template = template.replace(HTMLregex, (_, key) => {
-			let ret = data;
-			for (const prop of key.split('.')) {
-				ret = ret ? ret[prop] : '';
+	if (doubleBraceRegex.test(template)) {
+		template = template.replace(doubleBraceRegex, (_, key) => {
+			let result = data;
+
+			for (const property of key.split('.')) {
+				result = result ? result[property] : '';
 			}
 
-			// Encoding HTML Entities to avoid code injection
-			ret = escapeGoat.escape(ret.toString());
-
-			return ret || '';
+			return htmlEscape(result.toString()) || '';
 		});
 	}
 
-	const regex = /{(.*?)}/g;
+	const braceRegex = /{(.*?)}/g;
 
-	return template.replace(regex, (_, key) => {
+	return template.replace(braceRegex, (_, key) => {
 		let result = data;
 
 		for (const property of key.split('.')) {
