@@ -58,6 +58,6 @@ Data to interpolate into `template`.
 Template literals expand on creation. This module expands the template on execution, which can be useful if either or both template and data are lazily created or user-supplied.
 
 
-## License
+## Related
 
-MIT © [Sindre Sorhus](https://sindresorhus.com)
+- [pupa-cli](https://github.com/sindresorhus/pupa-cli) - CLI for this module
