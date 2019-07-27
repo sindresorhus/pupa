@@ -20,7 +20,7 @@ module.exports = (template, data) => {
 				result = result ? result[property] : '';
 			}
 
-			return htmlEscape(result.toString()) || '';
+			return htmlEscape(String(result));
 		});
 	}
 
@@ -33,6 +33,6 @@ module.exports = (template, data) => {
 			result = result ? result[property] : '';
 		}
 
-		return result || '';
+		return String(result);
 	});
 };

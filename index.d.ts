@@ -26,7 +26,7 @@ pupa('I like {{0}} and {{1}}', ['<br>🦄</br>', '<i>🐮</i>']);
 */
 declare function pupa(
 	template: string,
-	data: unknown[] | {[key: string]: unknown}
+	data: unknown[] | {[key: string]: any}
 ): string;
 
 export = pupa;
