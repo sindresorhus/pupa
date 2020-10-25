@@ -11,7 +11,7 @@ module.exports = (template, data) => {
 	}
 
 	// The regex tries to match either a number inside `{{ }}` or a valid JS identifier or key path.
-	const doubleBraceRegex = /{{(\d+|[a-z$_][a-z\d$_]*?(?:\.[a-z\d$_]*?)*?)}}/g;
+	const doubleBraceRegex = /{{(\d+|[a-z$_][a-z\d$_]*?(?:\.[a-z\d$_]*?)*?)}}/gi;
 
 	if (doubleBraceRegex.test(template)) {
 		template = template.replace(doubleBraceRegex, (_, key) => {
@@ -25,7 +25,7 @@ module.exports = (template, data) => {
 		});
 	}
 
-	const braceRegex = /{(\d+|[a-z$_][a-z\d$_]*?(?:\.[a-z\d$_]*?)*?)}/g;
+	const braceRegex = /{(\d+|[a-z$_][a-z\d$_]*?(?:\.[a-z\d$_]*?)*?)}/gi;
 
 	return template.replace(braceRegex, (_, key) => {
 		let result = data;

@@ -10,11 +10,11 @@ test('main', t => {
 	t.is(pupa('{foo}{bar}{foo}', {foo: '!', bar: '#'}), '!#!');
 	t.is(pupa('yo {foo} lol {bar} sup', {foo: '🦄', bar: '🌈'}), 'yo 🦄 lol 🌈 sup');
 
-	t.is(pupa('{foo}{deeply.nested.value}', {
+	t.is(pupa('{foo}{deeply.nested.valueFoo}', {
 		foo: '!',
 		deeply: {
 			nested: {
-				value: '#'
+				valueFoo: '#'
 			}
 		}
 	}), '!#');
@@ -29,11 +29,11 @@ test('main', t => {
 	t.is(pupa('{foo}{{bar}}{foo}', {foo: '!', bar: '#'}), '!#!');
 	t.is(pupa('yo {{foo}} lol {{bar}} sup', {foo: '🦄', bar: '🌈'}), 'yo 🦄 lol 🌈 sup');
 
-	t.is(pupa('{foo}{{deeply.nested.value}}', {
+	t.is(pupa('{foo}{{deeply.nested.valueFoo}}', {
 		foo: '!',
 		deeply: {
 			nested: {
-				value: '<br>#</br>'
+				valueFoo: '<br>#</br>'
 			}
 		}
 	}), '!&lt;br&gt;#&lt;/br&gt;');
