@@ -37,7 +37,8 @@
 		"micro"
 	],
 	"dependencies": {
-		"escape-goat": "^2.0.0"
+		"escape-goat": "^2.0.0",
+		"object-path": "^0.11.5"
 	},
 	"devDependencies": {
 		"ava": "^1.4.1",

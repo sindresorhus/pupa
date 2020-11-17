@@ -1,4 +1,5 @@
 'use strict';
+const objectPath = require('object-path');
 const {htmlEscape} = require('escape-goat');
 
 module.exports = (template, data) => {
@@ -15,11 +16,7 @@ module.exports = (template, data) => {
 
 	if (doubleBraceRegex.test(template)) {
 		template = template.replace(doubleBraceRegex, (_, key) => {
-			let result = data;
-
-			for (const property of key.split('.')) {
-				result = result ? result[property] : '';
-			}
+			const result = objectPath.get(data, key);
 
 			return htmlEscape(String(result));
 		});
@@ -28,11 +25,7 @@ module.exports = (template, data) => {
 	const braceRegex = /{(\d+|[a-z$_][a-z\d$_]*?(?:\.[a-z\d$_]*?)*?)}/gi;
 
 	return template.replace(braceRegex, (_, key) => {
-		let result = data;
-
-		for (const property of key.split('.')) {
-			result = result ? result[property] : '';
-		}
+		const result = objectPath.get(data, key);
 
 		return String(result);
 	});
