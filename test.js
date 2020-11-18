@@ -19,6 +19,15 @@ test('main', t => {
 		}
 	}), '!#');
 
+	t.is(pupa('{foo}{deeply.nested.value-foo}', {
+		foo: '!',
+		deeply: {
+			nested: {
+				'value-foo': '#'
+			}
+		}
+	}), '!#');
+
 	t.is(pupa('{0}{1}', ['!', '#']), '!#');
 
 	// Encoding HTML Entities to avoid code injection

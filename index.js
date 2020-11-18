@@ -12,21 +12,21 @@ module.exports = (template, data) => {
 	}
 
 	// The regex tries to match either a number inside `{{ }}` or a valid JS identifier or key path.
-	const doubleBraceRegex = /{{(\d+|[a-z$_][a-z\d$_]*?(?:\.[a-z\d$_]*?)*?)}}/gi;
+	const doubleBraceRegex = /{{(\d+|[a-z$_-\s][a-z\d$_-\s]*?(?:\.[a-z\d$_-\s]*?)*?)}}/gi;
 
 	if (doubleBraceRegex.test(template)) {
 		template = template.replace(doubleBraceRegex, (_, key) => {
 			const result = objectPath.get(data, key);
-
+			console.log(_, key);
 			return htmlEscape(String(result));
 		});
 	}
 
-	const braceRegex = /{(\d+|[a-z$_][a-z\d$_]*?(?:\.[a-z\d$_]*?)*?)}/gi;
+	const braceRegex = /{(\d+|[a-z$_-\s][a-z\d$_-\s]*?(?:\.[a-z\d$_-\s]*?)*?)}/gi;
 
 	return template.replace(braceRegex, (_, key) => {
 		const result = objectPath.get(data, key);
-
+		console.log(_, key);
 		return String(result);
 	});
 };
