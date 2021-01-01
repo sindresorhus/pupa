@@ -1,4 +1,4 @@
-# pupa [![Build Status](https://travis-ci.org/sindresorhus/pupa.svg?branch=master)](https://travis-ci.org/sindresorhus/pupa)
+# pupa
 
 > Simple micro templating
 
