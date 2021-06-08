@@ -1,5 +1,5 @@
 import test from 'ava';
-import pupa from '.';
+import pupa, {MissingValueError} from '.';
 
 test('main', t => {
 	// Normal placeholder
@@ -46,4 +46,31 @@ test('main', t => {
 test('do not match non-identifiers', t => {
 	const fixture = '"*.{json,md,css,graphql,html}"';
 	t.is(pupa(fixture, []), fixture);
+});
+
+test('ignore missing', t => {
+	const template = 'foo{{bar}}{undefined}';
+	const options = {ignoreMissing: true};
+	t.is(pupa(template, {}, options), template);
+});
+
+test('throw on undefined by default', t => {
+	t.throws(() => pupa('{foo}', {}), MissingValueError);
+});
+
+test('transform and ignore missing', t => {
+	const options = {
+		ignoreMissing: true,
+		transform: ({value}) => Number.isNaN(parseInt(value, 10)) ? undefined : value
+	};
+	t.is(pupa('{0} {1} {2}', ['0', 42, 3.14], options), '0 42 3.14');
+	t.is(pupa('{0} {1} {2}', ['0', null, 3.14], options), '0 {1} 3.14');
+});
+
+test('transform and throw on undefined', t => {
+	const options = {
+		transform: ({value}) => Number.isNaN(parseInt(value, 10)) ? undefined : value
+	};
+	t.notThrows(() => pupa('{0} {1} {2}', ['0', 42, 3.14], options), MissingValueError);
+	t.throws(() => pupa('{0} {1} {2}', ['0', null, 3.14], options), MissingValueError);
 });

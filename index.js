@@ -1,7 +1,23 @@
 'use strict';
 const {htmlEscape} = require('escape-goat');
 
-module.exports = (template, data) => {
+class MissingValueError extends Error {
+	constructor(key) {
+		super(`Missing a value for ${key ? `the placeholder: ${key}` : 'a placeholder'}`, key);
+		this.name = 'MissingValueError';
+		this.key = key;
+	}
+}
+
+const defaultOptions = {
+	ignoreMissing: false,
+	transform: ({value}) => value
+};
+
+module.exports = (template, data, options = {}) => {
+	const ignoreMissing = options.ignoreMissing || defaultOptions.ignoreMissing;
+	const transform = options.transform || defaultOptions.transform;
+
 	if (typeof template !== 'string') {
 		throw new TypeError(`Expected a \`string\` in the first argument, got \`${typeof template}\``);
 	}
@@ -14,26 +30,36 @@ module.exports = (template, data) => {
 	const doubleBraceRegex = /{{(\d+|[a-z$_][a-z\d$_]*?(?:\.[a-z\d$_]*?)*?)}}/gi;
 
 	if (doubleBraceRegex.test(template)) {
-		template = template.replace(doubleBraceRegex, (_, key) => {
-			let result = data;
+		template = template.replace(doubleBraceRegex, (placeholder, key) => {
+			const value = key.split('.').reduce((value, key) => value ? value[key] : undefined, data);
+			const transformedValue = transform({value, key});
+			if (transformedValue === undefined) {
+				if (ignoreMissing) {
+					return placeholder;
+				}
 
-			for (const property of key.split('.')) {
-				result = result ? result[property] : '';
+				throw new MissingValueError(key);
 			}
 
-			return htmlEscape(String(result));
+			return htmlEscape(String(transformedValue));
 		});
 	}
 
 	const braceRegex = /{(\d+|[a-z$_][a-z\d$_]*?(?:\.[a-z\d$_]*?)*?)}/gi;
 
-	return template.replace(braceRegex, (_, key) => {
-		let result = data;
+	return template.replace(braceRegex, (placeholder, key) => {
+		const value = key.split('.').reduce((value, key) => value ? value[key] : undefined, data);
+		const transformedValue = transform({value, key});
+		if (transformedValue === undefined) {
+			if (ignoreMissing) {
+				return placeholder;
+			}
 
-		for (const property of key.split('.')) {
-			result = result ? result[property] : '';
+			throw new MissingValueError(key);
 		}
 
-		return String(result);
+		return String(transformedValue);
 	});
 };
+
+module.exports.MissingValueError = MissingValueError;
