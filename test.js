@@ -55,7 +55,9 @@ test('ignore missing', t => {
 });
 
 test('throw on undefined by default', t => {
-	t.throws(() => pupa('{foo}', {}), MissingValueError);
+	t.throws(() => {
+		pupa('{foo}', {});
+	}, MissingValueError);
 });
 
 test('transform and ignore missing', t => {
