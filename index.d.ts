@@ -28,23 +28,8 @@ pupa('I like {{0}} and {{1}}', ['<br>🦄</br>', '<i>🐮</i>']);
 declare function pupa(
 	template: string,
 	data: unknown[] | {[key: string]: any},
-	options?: Options
+	options?: pupa.Options
 ): string;
-
-declare type Options = {
-	/**
-	By default, Pupa throws a `MissingValueError` when a placeholder resolves to `undefined`. With this option being `true`, it simply ignores it and leaves the placeholder as is.
-
-	@default false
-	*/
-	ignoreMissing?: boolean;
-	/**
-	Performs arbitrary operation for each interpolation. If the returned value was `undefined`, it behaves different depending on `ignoreMissing` option. Otherwise, the returned value will be passed to `String` constructor (and escaped when double-braced) and embedded into the template.
-
-	@default ({value}) => value
-	*/
-	transform?: (data: {value: unknown; key: string}) => unknown;
-}
 
 declare namespace pupa {
 	export class MissingValueError extends Error {
@@ -52,6 +37,21 @@ declare namespace pupa {
 		message: string;
 		key: string;
 		name: 'MissingValueError';
+	}
+
+	export type Options = {
+		/**
+		By default, Pupa throws a `MissingValueError` when a placeholder resolves to `undefined`. With this option being `true`, it simply ignores it and leaves the placeholder as is.
+
+		@default false
+		*/
+		ignoreMissing?: boolean;
+		/**
+		Performs arbitrary operation for each interpolation. If the returned value was `undefined`, it behaves different depending on `ignoreMissing` option. Otherwise, the returned value will be passed to `String` constructor (and escaped when double-braced) and embedded into the template.
+
+		@default ({value}) => value
+		*/
+		transform?: (data: {value: unknown; key: string}) => unknown;
 	}
 }
 
