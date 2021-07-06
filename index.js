@@ -31,7 +31,11 @@ module.exports = (template, data, options = {}) => {
 
 	if (doubleBraceRegex.test(template)) {
 		template = template.replace(doubleBraceRegex, (placeholder, key) => {
-			const value = key.split('.').reduce((value, key) => value ? value[key] : undefined, data);
+			let value = data;
+			for (const property of key.split('.')) {
+				value = value ? value[property] : undefined;
+			}
+
 			const transformedValue = transform({value, key});
 			if (transformedValue === undefined) {
 				if (ignoreMissing) {
@@ -48,7 +52,11 @@ module.exports = (template, data, options = {}) => {
 	const braceRegex = /{(\d+|[a-z$_][a-z\d$_]*?(?:\.[a-z\d$_]*?)*?)}/gi;
 
 	return template.replace(braceRegex, (placeholder, key) => {
-		const value = key.split('.').reduce((value, key) => value ? value[key] : undefined, data);
+		let value = data;
+		for (const property of key.split('.')) {
+			value = value ? value[property] : undefined;
+		}
+
 		const transformedValue = transform({value, key});
 		if (transformedValue === undefined) {
 			if (ignoreMissing) {
