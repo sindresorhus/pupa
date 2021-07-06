@@ -18,32 +18,7 @@ module.exports = (template, data, {ignoreMissing = false, transform = ({value}) 
 		throw new TypeError(`Expected an \`object\` or \`Array\` in the second argument, got \`${typeof data}\``);
 	}
 
-	// The regex tries to match either a number inside `{{ }}` or a valid JS identifier or key path.
-	const doubleBraceRegex = /{{(\d+|[a-z$_][a-z\d$_]*?(?:\.[a-z\d$_]*?)*?)}}/gi;
-
-	if (doubleBraceRegex.test(template)) {
-		template = template.replace(doubleBraceRegex, (placeholder, key) => {
-			let value = data;
-			for (const property of key.split('.')) {
-				value = value ? value[property] : undefined;
-			}
-
-			const transformedValue = transform({value, key});
-			if (transformedValue === undefined) {
-				if (ignoreMissing) {
-					return placeholder;
-				}
-
-				throw new MissingValueError(key);
-			}
-
-			return htmlEscape(String(transformedValue));
-		});
-	}
-
-	const braceRegex = /{(\d+|[a-z$_][a-z\d$_]*?(?:\.[a-z\d$_]*?)*?)}/gi;
-
-	return template.replace(braceRegex, (placeholder, key) => {
+	const replace = (placeholder, key) => {
 		let value = data;
 		for (const property of key.split('.')) {
 			value = value ? value[property] : undefined;
@@ -59,7 +34,20 @@ module.exports = (template, data, {ignoreMissing = false, transform = ({value}) 
 		}
 
 		return String(transformedValue);
-	});
+	};
+
+	const composeHtmlEscape = replacer => (...args) => htmlEscape(replacer(...args));
+
+	// The regex tries to match either a number inside `{{ }}` or a valid JS identifier or key path.
+	const doubleBraceRegex = /{{(\d+|[a-z$_][a-z\d$_]*?(?:\.[a-z\d$_]*?)*?)}}/gi;
+
+	if (doubleBraceRegex.test(template)) {
+		template = template.replace(doubleBraceRegex, composeHtmlEscape(replace));
+	}
+
+	const braceRegex = /{(\d+|[a-z$_][a-z\d$_]*?(?:\.[a-z\d$_]*?)*?)}/gi;
+
+	return template.replace(braceRegex, replace);
 };
 
 module.exports.MissingValueError = MissingValueError;
