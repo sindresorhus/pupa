@@ -9,15 +9,7 @@ class MissingValueError extends Error {
 	}
 }
 
-const defaultOptions = {
-	ignoreMissing: false,
-	transform: ({value}) => value
-};
-
-module.exports = (template, data, options = {}) => {
-	const ignoreMissing = options.ignoreMissing || defaultOptions.ignoreMissing;
-	const transform = options.transform || defaultOptions.transform;
-
+module.exports = (template, data, {ignoreMissing = false, transform = ({value}) => value} = {}) => {
 	if (typeof template !== 'string') {
 		throw new TypeError(`Expected a \`string\` in the first argument, got \`${typeof template}\``);
 	}
