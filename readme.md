@@ -36,7 +36,7 @@ pupa('I like {{0}} and {{1}}', ['<br>🦄</br>', '<i>🐮</i>']);
 
 ## API
 
-### pupa(template, data)
+### pupa(template, data, options?)
 
 #### template
 
@@ -50,6 +50,23 @@ Type: `object | unknown[]`
 
 Data to interpolate into `template`.
 
+#### options
+
+Type: `object | undefined` (default: `{}`)
+
+Options to customize behavior.
+
+#### options.ignoreMissing
+
+Type: `boolean | undefined` (default: `false`)
+
+By default, Pupa throws a `MissingValueError` when a placeholder resolves to `undefined`. With this option set `true`, it simply ignores it and leaves the placeholder as is.
+
+#### options.transform
+
+Type: `((data: {value: unknown; key: string}) => unknown) | undefined` (default: `({value}) => value`)
+
+Performs arbitrary operation for each interpolation. If the returned value was `undefined`, it behaves different depending on `ignoreMissing` option. Otherwise, the returned value will be passed to `String` constructor (and escaped when double-braced) and embedded into the template.
 
 ## FAQ
 

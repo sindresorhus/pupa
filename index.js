@@ -1,7 +1,15 @@
 'use strict';
 const {htmlEscape} = require('escape-goat');
 
-module.exports = (template, data) => {
+class MissingValueError extends Error {
+	constructor(key) {
+		super(`Missing a value for ${key ? `the placeholder: ${key}` : 'a placeholder'}`, key);
+		this.name = 'MissingValueError';
+		this.key = key;
+	}
+}
+
+module.exports = (template, data, {ignoreMissing = false, transform = ({value}) => value} = {}) => {
 	if (typeof template !== 'string') {
 		throw new TypeError(`Expected a \`string\` in the first argument, got \`${typeof template}\``);
 	}
@@ -10,30 +18,36 @@ module.exports = (template, data) => {
 		throw new TypeError(`Expected an \`object\` or \`Array\` in the second argument, got \`${typeof data}\``);
 	}
 
+	const replace = (placeholder, key) => {
+		let value = data;
+		for (const property of key.split('.')) {
+			value = value ? value[property] : undefined;
+		}
+
+		const transformedValue = transform({value, key});
+		if (transformedValue === undefined) {
+			if (ignoreMissing) {
+				return placeholder;
+			}
+
+			throw new MissingValueError(key);
+		}
+
+		return String(transformedValue);
+	};
+
+	const composeHtmlEscape = replacer => (...args) => htmlEscape(replacer(...args));
+
 	// The regex tries to match either a number inside `{{ }}` or a valid JS identifier or key path.
 	const doubleBraceRegex = /{{(\d+|[a-z$_][a-z\d$_]*?(?:\.[a-z\d$_]*?)*?)}}/gi;
 
 	if (doubleBraceRegex.test(template)) {
-		template = template.replace(doubleBraceRegex, (_, key) => {
-			let result = data;
-
-			for (const property of key.split('.')) {
-				result = result ? result[property] : '';
-			}
-
-			return htmlEscape(String(result));
-		});
+		template = template.replace(doubleBraceRegex, composeHtmlEscape(replace));
 	}
 
 	const braceRegex = /{(\d+|[a-z$_][a-z\d$_]*?(?:\.[a-z\d$_]*?)*?)}/gi;
 
-	return template.replace(braceRegex, (_, key) => {
-		let result = data;
-
-		for (const property of key.split('.')) {
-			result = result ? result[property] : '';
-		}
-
-		return String(result);
-	});
+	return template.replace(braceRegex, replace);
 };
+
+module.exports.MissingValueError = MissingValueError;
