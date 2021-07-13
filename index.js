@@ -1,7 +1,6 @@
-'use strict';
-const {htmlEscape} = require('escape-goat');
+import {htmlEscape} from 'escape-goat';
 
-class MissingValueError extends Error {
+export class MissingValueError extends Error {
 	constructor(key) {
 		super(`Missing a value for ${key ? `the placeholder: ${key}` : 'a placeholder'}`, key);
 		this.name = 'MissingValueError';
@@ -9,7 +8,7 @@ class MissingValueError extends Error {
 	}
 }
 
-module.exports = (template, data, {ignoreMissing = false, transform = ({value}) => value} = {}) => {
+export default function pupa(template, data, {ignoreMissing = false, transform = ({value}) => value} = {}) {
 	if (typeof template !== 'string') {
 		throw new TypeError(`Expected a \`string\` in the first argument, got \`${typeof template}\``);
 	}
@@ -39,15 +38,13 @@ module.exports = (template, data, {ignoreMissing = false, transform = ({value}) 
 	const composeHtmlEscape = replacer => (...args) => htmlEscape(replacer(...args));
 
 	// The regex tries to match either a number inside `{{ }}` or a valid JS identifier or key path.
-	const doubleBraceRegex = /{{(\d+|[a-z$_][a-z\d$_]*?(?:\.[a-z\d$_]*?)*?)}}/gi;
+	const doubleBraceRegex = /{{(\d+|[a-z$_][\w$]*?(?:\.[\w$]*?)*?)}}/gi;
 
 	if (doubleBraceRegex.test(template)) {
 		template = template.replace(doubleBraceRegex, composeHtmlEscape(replace));
 	}
 
-	const braceRegex = /{(\d+|[a-z$_][a-z\d$_]*?(?:\.[a-z\d$_]*?)*?)}/gi;
+	const braceRegex = /{(\d+|[a-z$_][\w$]*?(?:\.[\w$]*?)*?)}/gi;
 
 	return template.replace(braceRegex, replace);
-};
-
-module.exports.MissingValueError = MissingValueError;
+}

@@ -4,18 +4,16 @@
 
 Useful when all you need is to fill in some placeholders.
 
-
 ## Install
 
 ```
 $ npm install pupa
 ```
 
-
 ## Usage
 
 ```js
-const pupa = require('pupa');
+import pupa from 'pupa';
 
 pupa('The mobile number of {name} is {phone.mobile}', {
 	name: 'Sindre',
@@ -28,11 +26,10 @@ pupa('The mobile number of {name} is {phone.mobile}', {
 pupa('I like {0} and {1}', ['🦄', '🐮']);
 //=> 'I like 🦄 and 🐮'
 
-// Double braces encodes the HTML entities to avoid code injection
+// Double braces encodes the HTML entities to avoid code injection.
 pupa('I like {{0}} and {{1}}', ['<br>🦄</br>', '<i>🐮</i>']);
 //=> 'I like &lt;br&gt;🦄&lt;/br&gt; and &lt;i&gt;🐮&lt;/i&gt;'
 ```
-
 
 ## API
 
@@ -52,28 +49,30 @@ Data to interpolate into `template`.
 
 #### options
 
-Type: `object | undefined` (default: `{}`)
+Type: `object`
 
-Options to customize behavior.
+##### ignoreMissing
 
-#### options.ignoreMissing
+Type: `boolean`\
+Default: `false`
 
-Type: `boolean | undefined` (default: `false`)
+By default, Pupa throws a `MissingValueError` when a placeholder resolves to `undefined`. With this option set to `true`, it simply ignores it and leaves the placeholder as is.
 
-By default, Pupa throws a `MissingValueError` when a placeholder resolves to `undefined`. With this option set `true`, it simply ignores it and leaves the placeholder as is.
-
-#### options.transform
+##### transform
 
 Type: `((data: {value: unknown; key: string}) => unknown) | undefined` (default: `({value}) => value`)
 
-Performs arbitrary operation for each interpolation. If the returned value was `undefined`, it behaves different depending on `ignoreMissing` option. Otherwise, the returned value will be passed to `String` constructor (and escaped when double-braced) and embedded into the template.
+Performs arbitrary operation for each interpolation. If the returned value was `undefined`, it behaves differently depending on the `ignoreMissing` option. Otherwise, the returned value will be interpolated into a string (and escaped when double-braced) and embedded into the template.
+
+### MissingValueError
+
+Exposed for instance checking.
 
 ## FAQ
 
 ### What about template literals?
 
 Template literals expand on creation. This module expands the template on execution, which can be useful if either or both template and data are lazily created or user-supplied.
-
 
 ## Related
 

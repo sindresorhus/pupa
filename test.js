@@ -1,5 +1,5 @@
 import test from 'ava';
-import pupa, {MissingValueError} from '.';
+import pupa, {MissingValueError} from './index.js';
 
 test('main', t => {
 	// Normal placeholder
@@ -14,9 +14,9 @@ test('main', t => {
 		foo: '!',
 		deeply: {
 			nested: {
-				valueFoo: '#'
-			}
-		}
+				valueFoo: '#',
+			},
+		},
 	}), '!#');
 
 	t.is(pupa('{0}{1}', ['!', '#']), '!#');
@@ -33,9 +33,9 @@ test('main', t => {
 		foo: '!',
 		deeply: {
 			nested: {
-				valueFoo: '<br>#</br>'
-			}
-		}
+				valueFoo: '<br>#</br>',
+			},
+		},
 	}), '!&lt;br&gt;#&lt;/br&gt;');
 
 	t.is(pupa('{{0}}{{1}}', ['!', '#']), '!#');
@@ -57,13 +57,13 @@ test('ignore missing', t => {
 test('throw on undefined by default', t => {
 	t.throws(() => {
 		pupa('{foo}', {});
-	}, MissingValueError);
+	}, {instanceOf: MissingValueError});
 });
 
 test('transform and ignore missing', t => {
 	const options = {
 		ignoreMissing: true,
-		transform: ({value}) => Number.isNaN(Number.parseInt(value, 10)) ? undefined : value
+		transform: ({value}) => Number.isNaN(Number.parseInt(value, 10)) ? undefined : value,
 	};
 	t.is(pupa('{0} {1} {2}', ['0', 42, 3.14], options), '0 42 3.14');
 	t.is(pupa('{0} {1} {2}', ['0', null, 3.14], options), '0 {1} 3.14');
@@ -71,8 +71,14 @@ test('transform and ignore missing', t => {
 
 test('transform and throw on undefined', t => {
 	const options = {
-		transform: ({value}) => Number.isNaN(parseInt(value, 10)) ? undefined : value
+		transform: ({value}) => Number.isNaN(Number.parseInt(value, 10)) ? undefined : value,
 	};
-	t.notThrows(() => pupa('{0} {1} {2}', ['0', 42, 3.14], options), MissingValueError);
-	t.throws(() => pupa('{0} {1} {2}', ['0', null, 3.14], options), MissingValueError);
+
+	t.notThrows(() => {
+		pupa('{0} {1} {2}', ['0', 42, 3.14], options);
+	});
+
+	t.throws(() => {
+		pupa('{0} {1} {2}', ['0', null, 3.14], options);
+	}, {instanceOf: MissingValueError});
 });
