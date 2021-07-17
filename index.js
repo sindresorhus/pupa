@@ -17,10 +17,13 @@ export default function pupa(template, data, {ignoreMissing = false, transform =
 		throw new TypeError(`Expected an \`object\` or \`Array\` in the second argument, got \`${typeof data}\``);
 	}
 
+	const nestedKeySplitRegex = /(?<!\\)\./gi;
+
 	const replace = (placeholder, key) => {
 		let value = data;
-		for (const property of key.split('.')) {
-			value = value ? value[property] : undefined;
+		for (const property of key.split(nestedKeySplitRegex)) {
+			const propertyWithoutEscape = property.replace('\\', '');
+			value = value ? value[propertyWithoutEscape] : undefined;
 		}
 
 		const transformedValue = transform({value, key});
@@ -38,13 +41,13 @@ export default function pupa(template, data, {ignoreMissing = false, transform =
 	const composeHtmlEscape = replacer => (...args) => htmlEscape(replacer(...args));
 
 	// The regex tries to match either a number inside `{{ }}` or a valid JS identifier or key path.
-	const doubleBraceRegex = /{{(\d+|[a-z$_][\w$]*?(?:\.[\w$]*?)*?)}}/gi;
+	const doubleBraceRegex = /{{(\d+|[a-z$_][\w$]*?(?:\\?\.[\w$]*?)*?)}}/gi;
 
 	if (doubleBraceRegex.test(template)) {
 		template = template.replace(doubleBraceRegex, composeHtmlEscape(replace));
 	}
 
-	const braceRegex = /{(\d+|[a-z$_][\w$]*?(?:\.[\w$]*?)*?)}/gi;
+	const braceRegex = /{(\d+|[a-z$_][\w$]*?(?:\\?\.[\w$]*?)*?)}/gi;
 
 	return template.replace(braceRegex, replace);
 }
