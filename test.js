@@ -19,6 +19,11 @@ test('main', t => {
 		},
 	}), '!#');
 
+	t.is(pupa('The mobile number of {name} is {phone\\.mobile}', {
+		name: 'Sindre',
+		'phone.mobile': '609 24 363',
+	}), 'The mobile number of Sindre is 609 24 363');
+
 	t.is(pupa('{0}{1}', ['!', '#']), '!#');
 
 	// Encoding HTML Entities to avoid code injection
@@ -37,6 +42,11 @@ test('main', t => {
 			},
 		},
 	}), '!&lt;br&gt;#&lt;/br&gt;');
+
+	t.is(pupa('The mobile number of {name} is {{phone\\.mobile}}', {
+		name: 'Sindre',
+		'phone.mobile': '<b>609 24 363</b>',
+	}), 'The mobile number of Sindre is &lt;b&gt;609 24 363&lt;/b&gt;');
 
 	t.is(pupa('{{0}}{{1}}', ['!', '#']), '!#');
 
