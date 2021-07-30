@@ -29,6 +29,24 @@ pupa('I like {0} and {1}', ['🦄', '🐮']);
 // Double braces encodes the HTML entities to avoid code injection.
 pupa('I like {{0}} and {{1}}', ['<br>🦄</br>', '<i>🐮</i>']);
 //=> 'I like &lt;br&gt;🦄&lt;/br&gt; and &lt;i&gt;🐮&lt;/i&gt;'
+
+// If parts of the replacement contains '.', escape the template with \\ (double-backslash).
+pupa('The mobile number of {name} is {user.phone\\.mobile}', {
+	name: 'Sindre',
+	user: {
+		'phone.mobile': '609 24 363',
+	},
+});
+//=> 'The mobile number of Sindre is 609 24 363'
+
+// Works with double braces too
+pupa('The mobile number of {name} is {{user.phone\\.mobile}}', {
+	name: 'Sindre',
+	user: {
+		'phone.mobile': '<b>609 24 363</b>',
+	},
+});
+//=> 'The mobile number of Sindre is &lt;b&gt;609 24 363&lt;/b&gt;');
 ```
 
 ## API
