@@ -31,6 +31,20 @@ test('main', t => {
 		},
 	}), 'The mobile number of Sindre is 609 24 363');
 
+	t.is(pupa('{foo\\.bar} {foo\\.bar\\.baz}', {
+		'foo.bar': 'Foo!',
+		'foo.bar.baz': 'Baz!',
+	}), 'Foo! Baz!');
+
+	t.is(pupa('{foobar.foo} {foobar.escaped.one\\.two\\.three}', {
+		foobar: {
+			foo: 'Unescaped',
+			escaped: {
+				'one.two.three': 'Nested Escaped!',
+			},
+		},
+	}), 'Unescaped Nested Escaped!');
+
 	t.is(pupa('{0}{1}', ['!', '#']), '!#');
 
 	// Encoding HTML Entities to avoid code injection
@@ -61,6 +75,20 @@ test('main', t => {
 			'phone.mobile': '<b>609 24 363</b>',
 		},
 	}), 'The mobile number of Sindre is &lt;b&gt;609 24 363&lt;/b&gt;');
+
+	t.is(pupa('{foo\\.bar} {{foo\\.bar\\.baz}}', {
+		'foo.bar': 'Foo!',
+		'foo.bar.baz': '<b>Baz!</b>',
+	}), 'Foo! &lt;b&gt;Baz!&lt;/b&gt;');
+
+	t.is(pupa('{foobar.foo} {{foobar.escaped.one\\.two\\.three}}', {
+		foobar: {
+			foo: 'Unescaped',
+			escaped: {
+				'one.two.three': '<b>Nested Escaped!</b>',
+			},
+		},
+	}), 'Unescaped &lt;b&gt;Nested Escaped!&lt;/b&gt;');
 
 	t.is(pupa('{{0}}{{1}}', ['!', '#']), '!#');
 

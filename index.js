@@ -22,7 +22,7 @@ export default function pupa(template, data, {ignoreMissing = false, transform =
 	const replace = (placeholder, key) => {
 		let value = data;
 		for (const property of key.split(nestedKeySplitRegex)) {
-			const propertyWithoutEscape = property.replace('\\', '');
+			const propertyWithoutEscape = property.replace(/\\/g, '');
 			value = value ? value[propertyWithoutEscape] : undefined;
 		}
 
