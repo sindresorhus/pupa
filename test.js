@@ -6,6 +6,7 @@ test('main', t => {
 	t.is(pupa('{foo}', {foo: '!'}), '!');
 	t.is(pupa('{foo}', {foo: 10}), '10');
 	t.is(pupa('{foo}', {foo: 0}), '0');
+	t.is(pupa('{fo-o}', {'fo-o': 0}), '0');
 	t.is(pupa('{foo}{foo}', {foo: '!'}), '!!');
 	t.is(pupa('{foo}{bar}{foo}', {foo: '!', bar: '#'}), '!#!');
 	t.is(pupa('yo {foo} lol {bar} sup', {foo: '🦄', bar: '🌈'}), 'yo 🦄 lol 🌈 sup');
