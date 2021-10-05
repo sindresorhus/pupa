@@ -39,7 +39,7 @@ pupa('I like {{0}} and {{1}}', ['<br>🦄</br>', '<i>🐮</i>']);
 
 Type: `string`
 
-Text with placeholders for `data` properties.
+Text with `{key}` or `{{key}}` placeholders for `data` properties. Key may contain `.` to access deely into nested objects. `\` maybe used to escape special characters (`.`, `{`, `}` or `\`) anywhere in the template.
 
 #### data
 

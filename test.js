@@ -44,11 +44,6 @@ test('main', t => {
 	t.is(pupa('{{0}}{{1}}', ['<br>yo</br>', '<i>lol</i>']), '&lt;br&gt;yo&lt;/br&gt;&lt;i&gt;lol&lt;/i&gt;');
 });
 
-test('do not match non-identifiers', t => {
-	const fixture = '"*.{json,md,css,graphql,html}"';
-	t.is(pupa(fixture, []), fixture);
-});
-
 test('ignore missing', t => {
 	const template = 'foo{{bar}}{undefined}';
 	const options = {ignoreMissing: true};
