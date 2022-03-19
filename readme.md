@@ -6,8 +6,8 @@ Useful when all you need is to fill in some placeholders.
 
 ## Install
 
-```
-$ npm install pupa
+```sh
+npm install pupa
 ```
 
 ## Usage
@@ -30,6 +30,8 @@ pupa('I like {0} and {1}', ['🦄', '🐮']);
 pupa('I like {{0}} and {{1}}', ['<br>🦄</br>', '<i>🐮</i>']);
 //=> 'I like &lt;br&gt;🦄&lt;/br&gt; and &lt;i&gt;🐮&lt;/i&gt;'
 ```
+
+Note: It does not support nesting placeholders: `pupa('{phone.{type}}', …)`
 
 ## API
 
