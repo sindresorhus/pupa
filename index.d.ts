@@ -24,7 +24,7 @@ export type Options = {
 Simple micro templating.
 
 @param template - Text with placeholders for `data` properties.
-@param data - Data to interpolate into `template`.
+@param data - Data to interpolate into `template`. The keys should be a valid JS identifier or number (`a-z`, `A-Z`, `0-9`).
 
 @example
 ```

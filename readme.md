@@ -49,6 +49,8 @@ Type: `object | unknown[]`
 
 Data to interpolate into `template`.
 
+The keys should be a valid JS identifier or number (`a-z`, `A-Z`, `0-9`).
+
 #### options
 
 Type: `object`
