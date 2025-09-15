@@ -1,6 +1,6 @@
 {
 	"name": "pupa",
-	"version": "3.2.0",
+	"version": "3.2.1",
 	"description": "Simple micro templating",
 	"license": "MIT",
 	"repository": "sindresorhus/pupa",
