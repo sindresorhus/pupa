@@ -7,13 +7,13 @@ export class MissingValueError extends Error {
 
 export type Options = {
 	/**
-	By default, Pupa throws a `MissingValueError` when a placeholder resolves to `undefined`. With this option set to `true`, it simply ignores it and leaves the placeholder as is.
+	By default, throws a `MissingValueError` when a placeholder resolves to `undefined`. When `true`, ignores missing values and leaves the placeholder as-is.
 
 	@default false
 	*/
 	ignoreMissing?: boolean;
 	/**
-	Performs arbitrary operation for each interpolation. If the returned value was `undefined`, it behaves differently depending on the `ignoreMissing` option. Otherwise, the returned value will be interpolated into a string (and escaped when double-braced) and embedded into the template.
+	Transform function called for each interpolation. If it returns `undefined`, behavior depends on the `ignoreMissing` option. Otherwise, the returned value is converted to a string (and HTML-escaped when using double braces).
 
 	@default ({value}) => value
 	*/
@@ -24,7 +24,7 @@ export type Options = {
 Simple micro templating.
 
 @param template - Text with placeholders for `data` properties.
-@param data - Data to interpolate into `template`. The keys should be a valid JS identifier or number (`a-z`, `A-Z`, `0-9`).
+@param data - Data to interpolate into `template`. The keys should be a valid JS identifier or number (`a-z`, `A-Z`, `0-9`). You can escape dots in placeholder keys with backslashes (e.g., `{foo\\.bar}` accesses the property `'foo.bar'` instead of `foo.bar`).
 
 @example
 ```
@@ -44,6 +44,12 @@ pupa('I like {0} and {1}', ['🦄', '🐮']);
 // Double braces encodes the HTML entities to avoid code injection.
 pupa('I like {{0}} and {{1}}', ['<br>🦄</br>', '<i>🐮</i>']);
 //=> 'I like &lt;br&gt;🦄&lt;/br&gt; and &lt;i&gt;🐮&lt;/i&gt;'
+
+// Escaped dots in property names
+pupa('The version is {package\\.version}', {
+	'package.version': '1.0.0'
+});
+//=> 'The version is 1.0.0'
 ```
 */
 export default function pupa(

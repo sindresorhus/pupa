@@ -29,6 +29,12 @@ pupa('I like {0} and {1}', ['🦄', '🐮']);
 // Double braces encodes the HTML entities to avoid code injection.
 pupa('I like {{0}} and {{1}}', ['<br>🦄</br>', '<i>🐮</i>']);
 //=> 'I like &lt;br&gt;🦄&lt;/br&gt; and &lt;i&gt;🐮&lt;/i&gt;'
+
+// Escaped dots in property names
+pupa('The version is {package\\.version}', {
+	'package.version': '1.0.0'
+});
+//=> 'The version is 1.0.0'
 ```
 
 Note: It does not support nesting placeholders: `pupa('{phone.{type}}', …)`
@@ -51,6 +57,8 @@ Data to interpolate into `template`.
 
 The keys should be a valid JS identifier or number (`a-z`, `A-Z`, `0-9`).
 
+You can escape dots in placeholder keys with backslashes (e.g., `{foo\\.bar}` accesses the property `'foo.bar'` instead of `foo.bar`).
+
 #### options
 
 Type: `object`
@@ -60,13 +68,13 @@ Type: `object`
 Type: `boolean`\
 Default: `false`
 
-By default, Pupa throws a `MissingValueError` when a placeholder resolves to `undefined`. With this option set to `true`, it simply ignores it and leaves the placeholder as is.
+By default, throws a `MissingValueError` when a placeholder resolves to `undefined`. When `true`, ignores missing values and leaves the placeholder as-is.
 
 ##### transform
 
-Type: `((data: {value: unknown; key: string}) => unknown) | undefined` (default: `({value}) => value`)
+Type: `function` (default: `({value}) => value`)
 
-Performs arbitrary operation for each interpolation. If the returned value was `undefined`, it behaves differently depending on the `ignoreMissing` option. Otherwise, the returned value will be interpolated into a string (and escaped when double-braced) and embedded into the template.
+Transform function called for each interpolation. If it returns `undefined`, behavior depends on the `ignoreMissing` option. Otherwise, the returned value is converted to a string (and HTML-escaped when using double braces).
 
 ### MissingValueError
 
@@ -76,7 +84,7 @@ Exposed for instance checking.
 
 ### What about template literals?
 
-Template literals expand on creation. This module expands the template on execution, which can be useful if either or both template and data are lazily created or user-supplied.
+Template literals are evaluated when the code runs. This module evaluates templates when you call it, which is useful when templates or data are created dynamically or come from user input.
 
 ## Related
 

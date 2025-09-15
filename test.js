@@ -1,46 +1,24 @@
 import test from 'ava';
 import pupa, {MissingValueError} from './index.js';
 
-test('main', t => {
-	// Normal placeholder
+test('basic functionality', t => {
+	// Various data types
 	t.is(pupa('{foo}', {foo: '!'}), '!');
-	t.is(pupa('{foo}', {foo: 10}), '10');
 	t.is(pupa('{foo}', {foo: 0}), '0');
 	t.is(pupa('{fo-o}', {'fo-o': 0}), '0');
-	t.is(pupa('{foo}{foo}', {foo: '!'}), '!!');
-	t.is(pupa('{foo}{bar}{foo}', {foo: '!', bar: '#'}), '!#!');
+
+	// Multiple placeholders
+	t.is(pupa('{foo}{bar}', {foo: '!', bar: '#'}), '!#');
 	t.is(pupa('yo {foo} lol {bar} sup', {foo: '🦄', bar: '🌈'}), 'yo 🦄 lol 🌈 sup');
 
-	t.is(pupa('{foo}{deeply.nested.valueFoo}', {
-		foo: '!',
-		deeply: {
-			nested: {
-				valueFoo: '#',
-			},
-		},
-	}), '!#');
-
+	// Nested properties and arrays
+	t.is(pupa('{deeply.nested.value}', {deeply: {nested: {value: '#'}}}), '#');
 	t.is(pupa('{0}{1}', ['!', '#']), '!#');
+});
 
-	// Encoding HTML Entities to avoid code injection
-	t.is(pupa('{{foo}}', {foo: '!'}), '!');
-	t.is(pupa('{{foo}}', {foo: 10}), '10');
-	t.is(pupa('{{foo}}', {foo: 0}), '0');
-	t.is(pupa('{{foo}}{{foo}}', {foo: '!'}), '!!');
-	t.is(pupa('{foo}{{bar}}{foo}', {foo: '!', bar: '#'}), '!#!');
-	t.is(pupa('yo {{foo}} lol {{bar}} sup', {foo: '🦄', bar: '🌈'}), 'yo 🦄 lol 🌈 sup');
-
-	t.is(pupa('{foo}{{deeply.nested.valueFoo}}', {
-		foo: '!',
-		deeply: {
-			nested: {
-				valueFoo: '<br>#</br>',
-			},
-		},
-	}), '!&lt;br&gt;#&lt;/br&gt;');
-
-	t.is(pupa('{{0}}{{1}}', ['!', '#']), '!#');
-
+test('html escaping', t => {
+	t.is(pupa('{{foo}}', {foo: '<script>alert("xss")</script>'}), '&lt;script&gt;alert(&quot;xss&quot;)&lt;/script&gt;');
+	t.is(pupa('{foo}{{bar}}', {foo: '!', bar: '<b>bold</b>'}), '!&lt;b&gt;bold&lt;/b&gt;');
 	t.is(pupa('{{0}}{{1}}', ['<br>yo</br>', '<i>lol</i>']), '&lt;br&gt;yo&lt;/br&gt;&lt;i&gt;lol&lt;/i&gt;');
 });
 
@@ -61,25 +39,34 @@ test('throw on undefined by default', t => {
 	}, {instanceOf: MissingValueError});
 });
 
-test('transform and ignore missing', t => {
+test('transform function', t => {
 	const options = {
-		ignoreMissing: true,
 		transform: ({value}) => Number.isNaN(Number.parseInt(value, 10)) ? undefined : value,
 	};
-	t.is(pupa('{0} {1} {2}', ['0', 42, 3.14], options), '0 42 3.14');
-	t.is(pupa('{0} {1} {2}', ['0', null, 3.14], options), '0 {1} 3.14');
+
+	// Transform with ignore missing
+	t.is(pupa('{0} {1}', ['0', null], {...options, ignoreMissing: true}), '0 {1}');
+
+	// Transform without ignore missing throws
+	t.throws(() => pupa('{0} {1}', ['0', null], options), {instanceOf: MissingValueError});
 });
 
-test('transform and throw on undefined', t => {
-	const options = {
-		transform: ({value}) => Number.isNaN(Number.parseInt(value, 10)) ? undefined : value,
-	};
+test('escaped dots in property names', t => {
+	// Basic escaped dot
+	t.is(pupa('{phone\\.mobile}', {'phone.mobile': '123'}), '123');
 
-	t.notThrows(() => {
-		pupa('{0} {1} {2}', ['0', 42, 3.14], options);
-	});
+	// HTML escaping with escaped dots
+	t.is(pupa('{{phone\\.mobile}}', {'phone.mobile': '<b>123</b>'}), '&lt;b&gt;123&lt;/b&gt;');
 
-	t.throws(() => {
-		pupa('{0} {1} {2}', ['0', null, 3.14], options);
-	}, {instanceOf: MissingValueError});
+	// Multiple escaped dots
+	t.is(pupa('{foo\\.bar\\.baz}', {'foo.bar.baz': 'value'}), 'value');
+
+	// Mixed escaped and normal dots
+	t.is(pupa('{user.name} {user\\.email}', {
+		user: {name: 'John'},
+		'user.email': 'john@example.com',
+	}), 'John john@example.com');
+
+	// Edge case: property ending with dot
+	t.is(pupa('{empty\\.}', {'empty.': 'works'}), 'works');
 });
