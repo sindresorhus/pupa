@@ -47,7 +47,7 @@ Note: It does not support nesting placeholders: `pupa('{phone.{type}}', …)`
 
 Type: `string`
 
-Text with placeholders for `data` properties.
+Text with placeholders for `data` properties. Supports filter syntax: `{key | filter1 | filter2}`.
 
 #### data
 
@@ -76,15 +76,50 @@ Type: `function` (default: `({value}) => value`)
 
 Transform function called for each interpolation. If it returns `undefined`, behavior depends on the `ignoreMissing` option. Otherwise, the returned value is converted to a string (and HTML-escaped when using double braces).
 
+##### filters
+
+Type: `object`\
+Default: `{}`
+
+Filters to apply to values.
+
+Filters can be chained using the pipe syntax: `{name | uppercase | reverse}`.
+
+```js
+import pupa from 'pupa';
+
+const filters = {
+	trim: value => value.trim(),
+	uppercase: value => value.toUpperCase()
+};
+
+pupa('{name | trim | uppercase}', {name: 'john '}, {filters});
+//=> 'JOHN'
+```
+
 ### MissingValueError
 
 Exposed for instance checking.
+
+### MissingFilterError
+
+Exposed for instance checking.
+
+Thrown when a filter is used that doesn't exist in the `filters` option.
 
 ## FAQ
 
 ### What about template literals?
 
 Template literals are evaluated when the code runs. This module evaluates templates when you call it, which is useful when templates or data are created dynamically or come from user input.
+
+### Will filters support parameters?
+
+No. Filters are simple functions that take a single value and return a transformed value. For complex transformations requiring parameters, use the `transform` option instead.
+
+### Are there built-in filters?
+
+No. This keeps the package minimal and focused. You can easily define your own filters.
 
 ## Related
 

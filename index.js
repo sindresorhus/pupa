@@ -8,7 +8,15 @@ export class MissingValueError extends Error {
 	}
 }
 
-export default function pupa(template, data, {ignoreMissing = false, transform = ({value}) => value} = {}) {
+export class MissingFilterError extends Error {
+	constructor(filterName) {
+		super(`Missing filter: ${filterName}`);
+		this.name = 'MissingFilterError';
+		this.filterName = filterName;
+	}
+}
+
+export default function pupa(template, data, {ignoreMissing = false, transform = ({value}) => value, filters = {}} = {}) {
 	if (typeof template !== 'string') {
 		throw new TypeError(`Expected a \`string\` in the first argument, got \`${typeof template}\``);
 	}
@@ -17,8 +25,7 @@ export default function pupa(template, data, {ignoreMissing = false, transform =
 		throw new TypeError(`Expected an \`object\` or \`Array\` in the second argument, got \`${typeof data}\``);
 	}
 
-	const replace = (placeholder, key) => {
-		// Parse key path, handling escaped dots
+	const parseKeyPath = key => {
 		const segments = [];
 		let segment = '';
 
@@ -35,11 +42,37 @@ export default function pupa(template, data, {ignoreMissing = false, transform =
 		}
 
 		segments.push(segment);
+		return segments;
+	};
+
+	const replace = (placeholder, keyWithFilters) => {
+		// Parse filters from the key (e.g., "name | capitalize | upper")
+		const parts = keyWithFilters.split('|').map(part => part.trim());
+		const key = parts[0];
+		const filterChain = parts.slice(1);
 
 		// Navigate object path
+		const segments = parseKeyPath(key);
 		let value = data;
 		for (const property of segments) {
 			value = value?.[property];
+		}
+
+		// Apply filters
+		for (const filterName of filterChain) {
+			const filter = filters[filterName];
+
+			if (!filter) {
+				if (ignoreMissing) {
+					return placeholder;
+				}
+
+				throw new MissingFilterError(filterName);
+			}
+
+			if (value !== undefined) {
+				value = filter(value);
+			}
 		}
 
 		const transformedValue = transform({value, key});
@@ -54,10 +87,14 @@ export default function pupa(template, data, {ignoreMissing = false, transform =
 		return String(transformedValue);
 	};
 
-	// ReDoS-safe regexes - backslash at end of character class
+	// ReDoS-safe regex to capture keys with optional filters
+	// Matches: {key} or {key | filter} or {key | filter1 | filter2}
 	const keyPattern = '(\\d+|[a-z$_][\\w\\-.$\\\\]*)';
-	const doubleBraceRegex = new RegExp(`{{${keyPattern}}}`, 'gi');
-	const singleBraceRegex = new RegExp(`{${keyPattern}}`, 'gi');
+	const filterPattern = '(?:\\|\\s*[a-z$_][\\w$]*\\s*)*';
+	const keyWithFiltersPattern = `(${keyPattern}\\s*${filterPattern})`;
+
+	const doubleBraceRegex = new RegExp(`{{${keyWithFiltersPattern}}}`, 'gi');
+	const singleBraceRegex = new RegExp(`{${keyWithFiltersPattern}}`, 'gi');
 
 	template = template.replace(doubleBraceRegex, (...arguments_) => htmlEscape(replace(...arguments_)));
 

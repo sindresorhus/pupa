@@ -5,6 +5,13 @@ export class MissingValueError extends Error {
 	constructor(key: string);
 }
 
+export class MissingFilterError extends Error {
+	name: 'MissingFilterError';
+	message: string;
+	filterName: string;
+	constructor(filterName: string);
+}
+
 export type Options = {
 	/**
 	By default, throws a `MissingValueError` when a placeholder resolves to `undefined`. When `true`, ignores missing values and leaves the placeholder as-is.
@@ -12,18 +19,43 @@ export type Options = {
 	@default false
 	*/
 	ignoreMissing?: boolean;
+
 	/**
-	Transform function called for each interpolation. If it returns `undefined`, behavior depends on the `ignoreMissing` option. Otherwise, the returned value is converted to a string (and HTML-escaped when using double braces).
+	Transform function called for each interpolation.
 
 	@default ({value}) => value
+
+	If it returns `undefined`, behavior depends on the `ignoreMissing` option. Otherwise, the returned value is converted to a string (and HTML-escaped when using double braces).
 	*/
 	transform?: (data: {value: unknown; key: string}) => unknown;
+
+	/**
+	Filters to apply to values.
+
+	Filters can be chained using the pipe syntax: `{name | uppercase | reverse}`.
+
+	@default {}
+
+	@example
+	```
+	import pupa from 'pupa';
+
+	const filters = {
+		trim: value => value.trim(),
+		uppercase: value => value.toUpperCase()
+	};
+
+	pupa('{name | trim | uppercase}', {name: 'john '}, {filters});
+	//=> 'JOHN'
+	```
+	*/
+	filters?: Record<string, (value: unknown) => unknown>;
 };
 
 /**
 Simple micro templating.
 
-@param template - Text with placeholders for `data` properties.
+@param template - Text with placeholders for `data` properties. Supports filter syntax: `{key | filter1 | filter2}`.
 @param data - Data to interpolate into `template`. The keys should be a valid JS identifier or number (`a-z`, `A-Z`, `0-9`). You can escape dots in placeholder keys with backslashes (e.g., `{foo\\.bar}` accesses the property `'foo.bar'` instead of `foo.bar`).
 
 @example
