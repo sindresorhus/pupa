@@ -55,7 +55,11 @@ export default function pupa(template, data, {ignoreMissing = false, transform =
 		const segments = parseKeyPath(key);
 		let value = data;
 		for (const property of segments) {
-			value = value?.[property];
+			/// value = value?.[property];
+
+			if (value) {
+				value = value[property];
+			}
 		}
 
 		// Apply filters
