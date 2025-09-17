@@ -55,7 +55,7 @@ export type Options = {
 /**
 Simple micro templating.
 
-@param template - Text with placeholders for `data` properties. Supports filter syntax: `{key | filter1 | filter2}`.
+@param template - Text with placeholders for `data` properties. Supports filter syntax: `{key | filter1 | filter2}`. Use `\{` and `\}` to include literal braces in the output.
 @param data - Data to interpolate into `template`. The keys should be a valid JS identifier or number (`a-z`, `A-Z`, `0-9`). You can escape dots in placeholder keys with backslashes (e.g., `{foo\\.bar}` accesses the property `'foo.bar'` instead of `foo.bar`).
 
 @example
@@ -82,6 +82,13 @@ pupa('The version is {package\\.version}', {
 	'package.version': '1.0.0'
 });
 //=> 'The version is 1.0.0'
+
+// Escape literal braces
+pupa('Use \\{key\\} syntax for placeholders', {});
+//=> 'Use {key} syntax for placeholders'
+
+pupa('Hi {name}! Use \\{key\\} for placeholders', {name: 'John'});
+//=> 'Hi John! Use {key} for placeholders'
 ```
 */
 export default function pupa(

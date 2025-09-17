@@ -146,3 +146,30 @@ test('filters - interaction with transform function', t => {
 
 	t.is(pupa('{name | upper}', {name: 'john'}, options), '[JOHN]');
 });
+
+test('escape sequences for literal braces', t => {
+	// Basic escape sequences
+	t.is(pupa('Use \\{placeholder\\} syntax', {}), 'Use {placeholder} syntax');
+	t.is(pupa('\\{name\\} is {name}', {name: 'John'}), '{name} is John');
+
+	// Mixed escaped and unescaped
+	t.is(pupa('Hi {name}! Use \\{key\\} for placeholders', {name: 'John'}), 'Hi John! Use {key} for placeholders');
+
+	// Only escape left brace
+	t.is(pupa('\\{incomplete', {}), '{incomplete');
+
+	// Only escape right brace
+	t.is(pupa('incomplete\\}', {}), 'incomplete}');
+
+	// Multiple escaped braces
+	t.is(pupa('\\{\\{double\\}\\}', {}), '{{double}}');
+
+	// Escaped braces with HTML escaping
+	t.is(pupa('\\{\\{html\\}\\} and {{name}}', {name: '<b>test</b>'}), '{{html}} and &lt;b&gt;test&lt;/b&gt;');
+
+	// Escaped braces don't interfere with filters
+	t.is(pupa('\\{name | upper\\} but {name | upper}', {name: 'john'}, {filters: testFilters}), '{name | upper} but JOHN');
+
+	// Complex example from the issue
+	t.is(pupa('Hi, {name}! To declare placeholders, use the syntax \\{foobar\\}', {name: 'John'}), 'Hi, John! To declare placeholders, use the syntax {foobar}');
+});

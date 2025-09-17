@@ -25,6 +25,13 @@ export default function pupa(template, data, {ignoreMissing = false, transform =
 		throw new TypeError(`Expected an \`object\` or \`Array\` in the second argument, got \`${typeof data}\``);
 	}
 
+	// Handle escape sequences for literal braces
+	const escapedLeftBrace = '\uE000\uE001\uE002'; // Private use characters as temporary marker
+	const escapedRightBrace = '\uE003\uE004\uE005'; // Private use characters as temporary marker
+
+	template = template.replace(/\\{/g, escapedLeftBrace);
+	template = template.replace(/\\}/g, escapedRightBrace);
+
 	const parseKeyPath = key => {
 		const segments = [];
 		let segment = '';
@@ -102,5 +109,11 @@ export default function pupa(template, data, {ignoreMissing = false, transform =
 
 	template = template.replace(doubleBraceRegex, (...arguments_) => htmlEscape(replace(...arguments_)));
 
-	return template.replace(singleBraceRegex, replace);
+	template = template.replace(singleBraceRegex, replace);
+
+	// Replace temporary markers with literal braces
+	template = template.replace(new RegExp(escapedLeftBrace, 'g'), '{');
+	template = template.replace(new RegExp(escapedRightBrace, 'g'), '}');
+
+	return template;
 }
